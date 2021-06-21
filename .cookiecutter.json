@@ -1,0 +1,10 @@
+{
+  "_template": "gh:oncleben31/cookiecutter-homeassistant-custom-component",
+  "class_name_prefix": "Voicemail",
+  "domain_name": "voicemail",
+  "friendly_name": "HA Voicemail",
+  "github_user": "danieldotnl",
+  "project_name": "ha-voicemail",
+  "test_suite": "yes",
+  "version": "0.0.1"
+}

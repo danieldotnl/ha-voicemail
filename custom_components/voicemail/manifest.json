@@ -1,0 +1,11 @@
+{
+  "domain": "voicemail",
+  "name": "HA Voicemail",
+  "documentation": "https://github.com/danieldotnl/ha-voicemail",
+  "issue_tracker": "https://github.com/danieldotnl/ha-voicemail/issues",
+  "dependencies": [],
+  "config_flow": true,
+  "codeowners": ["@danieldotnl"],
+  "requirements": [],
+  "version": "0.0.1"
+}
