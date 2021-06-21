@@ -22,6 +22,7 @@ from .const import CONF_USERNAME
 from .const import DOMAIN
 from .const import PLATFORMS
 from .const import STARTUP_MESSAGE
+from .machine import Machine
 
 SCAN_INTERVAL = timedelta(seconds=30)
 
@@ -33,11 +34,28 @@ async def async_setup(hass: HomeAssistant, config: Config):
     return True
 
 
+async def _async_setup_services(hass: HomeAssistant):
+    async def async_record_when(call):
+        machine: Machine = hass.data[DOMAIN]["MACHINE_INSTANCE"]
+        await machine.async_record_when(call.data)
+
+    hass.services.async_register(DOMAIN, "record_when", async_record_when)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up this integration using UI."""
+
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
         _LOGGER.info(STARTUP_MESSAGE)
+
+    machine = Machine(hass, entry)
+
+    data = {
+        "MACHINE_INSTANCE": machine,
+    }
+    hass.data[DOMAIN] = data
+    await _async_setup_services(hass)
 
     username = entry.data.get(CONF_USERNAME)
     password = entry.data.get(CONF_PASSWORD)
