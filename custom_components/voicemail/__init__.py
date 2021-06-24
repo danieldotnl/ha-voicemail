@@ -15,7 +15,6 @@ from .const import CONF_NAME
 from .const import DOMAIN
 from .const import MACHINE_INSTANCE
 from .const import PLATFORMS
-from .const import STARTUP_MESSAGE
 from .machine import Machine
 from .schema import SERVICE_RECORD_WHEN_SCHEMA
 
@@ -54,7 +53,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {}
-        _LOGGER.info(STARTUP_MESSAGE)
 
     machine = Machine(hass, entry)
 
