@@ -11,7 +11,7 @@ ISSUE_URL = "https://github.com/danieldotnl/ha-voicemail/issues"
 MACHINE_INSTANCE = "machine"
 
 # Icons
-ICON = "mdi:format-quote-close"
+ICON = "mdi:format-list-numbered"
 
 # Device classes
 BINARY_SENSOR_DEVICE_CLASS = "connectivity"
@@ -28,7 +28,7 @@ CONF_ENABLED = "enabled"
 CONF_NAME = "name"
 
 # Defaults
-DEFAULT_NAME = DOMAIN
+MESSAGE_COUNT = "messages count"
 
 
 STARTUP_MESSAGE = f"""

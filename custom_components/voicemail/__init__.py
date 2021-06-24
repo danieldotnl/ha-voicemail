@@ -11,6 +11,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Config
 from homeassistant.core import HomeAssistant
 
+from .const import CONF_NAME
 from .const import DOMAIN
 from .const import MACHINE_INSTANCE
 from .const import PLATFORMS
@@ -28,7 +29,11 @@ async def async_setup(hass: HomeAssistant, config: Config):
     return True
 
 
-async def _async_setup_services(hass: HomeAssistant, entry_id):
+async def _async_setup_services(hass: HomeAssistant, entry):
+
+    entry_id = entry.entry_id
+    name = entry.data[CONF_NAME]
+
     async def async_record_when(service_call):
         _LOGGER.debug("Service call: %s", service_call)
         machine: Machine = hass.data[DOMAIN][entry_id][MACHINE_INSTANCE]
@@ -39,9 +44,9 @@ async def _async_setup_services(hass: HomeAssistant, entry_id):
         await machine.async_play()
 
     hass.services.async_register(
-        DOMAIN, "record_when", async_record_when, SERVICE_RECORD_WHEN_SCHEMA
+        DOMAIN, f"{name}_record_when", async_record_when, SERVICE_RECORD_WHEN_SCHEMA
     )
-    hass.services.async_register(DOMAIN, "play_all", async_play)
+    hass.services.async_register(DOMAIN, f"{name}_play_all", async_play)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -57,7 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         MACHINE_INSTANCE: machine,
     }
     hass.data[DOMAIN][entry.entry_id] = data
-    await _async_setup_services(hass, entry.entry_id)
+    await _async_setup_services(hass, entry)
 
     # username = entry.data.get(CONF_USERNAME)
     # password = entry.data.get(CONF_PASSWORD)

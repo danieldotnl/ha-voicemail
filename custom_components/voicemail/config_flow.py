@@ -1,7 +1,6 @@
 """Adds config flow for HA Voicemail."""
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.util import slugify
 
 from .const import CONF_NAME
 from .const import DOMAIN
@@ -29,7 +28,7 @@ class VoicemailFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
             return self.async_create_entry(
                 title=user_input[CONF_NAME],
-                data={CONF_NAME: slugify(user_input[CONF_NAME])},
+                data={CONF_NAME: user_input[CONF_NAME]},
             )
 
         return await self._show_config_form(user_input)
