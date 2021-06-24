@@ -64,51 +64,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN][entry.entry_id] = data
     await _async_setup_services(hass, entry)
 
-    # username = entry.data.get(CONF_USERNAME)
-    # password = entry.data.get(CONF_PASSWORD)
-
-    # session = async_get_clientsession(hass)
-    # client = VoicemailApiClient(username, password, session)
-
-    # coordinator = VoicemailDataUpdateCoordinator(hass, client=client)
-    # await coordinator.async_refresh()
-
-    # if not coordinator.last_update_success:
-    #    raise ConfigEntryNotReady
-
-    # hass.data[DOMAIN][entry.entry_id] = coordinator
-    # _LOGGER.debug("Entry id = %s", entry.entry_id)
-
-    # for platform in PLATFORMS:
-    #     if entry.options.get(platform, True):
-    #         coordinator.platforms.append(platform)
-    #         hass.async_add_job(
-    #             hass.config_entries.async_forward_entry_setup(entry, platform)
-    #         )
-
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    entry.add_update_listener(async_reload_entry)
 
-    # entry.add_update_listener(async_reload_entry)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Handle removal of an entry."""
-    # coordinator = hass.data[DOMAIN][entry.entry_id]
-    # unloaded = all(
-    #     await asyncio.gather(
-    #         *[
-    #             hass.config_entries.async_forward_entry_unload(entry, platform)
-    #             for platform in PLATFORMS
-    #             if platform in coordinator.platforms
-    #         ]
-    #     )
-    # )
-    # if unloaded:
-    #     hass.data[DOMAIN].pop(entry.entry_id)
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
-    # return unloaded
-    return True
+    if not unload_ok:
+        return False
+
+    name = entry.data[CONF_NAME]
+    hass.data[DOMAIN].pop(entry.entry_id)
+    hass.services.async_remove(DOMAIN, f"{name}_play_all")
+    hass.services.async_remove(DOMAIN, f"{name}_record_when")
+
+    return unload_ok
 
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
