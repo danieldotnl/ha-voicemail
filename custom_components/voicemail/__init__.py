@@ -10,11 +10,10 @@ from datetime import timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Config
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.helpers.update_coordinator import UpdateFailed
 
-from .api import VoicemailApiClient
 from .const import DOMAIN
+from .const import MACHINE_INSTANCE
+from .const import PLATFORMS
 from .const import STARTUP_MESSAGE
 from .machine import Machine
 from .schema import SERVICE_RECORD_WHEN_SCHEMA
@@ -29,35 +28,36 @@ async def async_setup(hass: HomeAssistant, config: Config):
     return True
 
 
-async def _async_setup_services(hass: HomeAssistant):
+async def _async_setup_services(hass: HomeAssistant, entry_id):
     async def async_record_when(service_call):
-        machine: Machine = hass.data[DOMAIN]["MACHINE_INSTANCE"]
+        _LOGGER.debug("Service call: %s", service_call)
+        machine: Machine = hass.data[DOMAIN][entry_id][MACHINE_INSTANCE]
         await machine.async_record_when(service_call.data)
 
-    async def async_play_all(service_call):
-        machine: Machine = hass.data[DOMAIN]["MACHINE_INSTANCE"]
-        await machine.async_play_all()
+    async def async_play(service_call):
+        machine: Machine = hass.data[DOMAIN][entry_id][MACHINE_INSTANCE]
+        await machine.async_play()
 
     hass.services.async_register(
         DOMAIN, "record_when", async_record_when, SERVICE_RECORD_WHEN_SCHEMA
     )
-    hass.services.async_register(DOMAIN, "play_all", async_play_all)
+    hass.services.async_register(DOMAIN, "play_all", async_play)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up this integration using UI."""
 
     if hass.data.get(DOMAIN) is None:
-        hass.data.setdefault(DOMAIN, {})
+        hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {}
         _LOGGER.info(STARTUP_MESSAGE)
 
     machine = Machine(hass, entry)
 
     data = {
-        "MACHINE_INSTANCE": machine,
+        MACHINE_INSTANCE: machine,
     }
-    hass.data[DOMAIN] = data
-    await _async_setup_services(hass)
+    hass.data[DOMAIN][entry.entry_id] = data
+    await _async_setup_services(hass, entry.entry_id)
 
     # username = entry.data.get(CONF_USERNAME)
     # password = entry.data.get(CONF_PASSWORD)
@@ -81,30 +81,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     #             hass.config_entries.async_forward_entry_setup(entry, platform)
     #         )
 
-    entry.add_update_listener(async_reload_entry)
+    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+
+    # entry.add_update_listener(async_reload_entry)
     return True
-
-
-class VoicemailDataUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching data from the API."""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        client: VoicemailApiClient,
-    ) -> None:
-        """Initialize."""
-        self.api = client
-        self.platforms = []
-
-        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
-
-    async def _async_update_data(self):
-        """Update data via library."""
-        try:
-            return await self.api.async_get_data()
-        except Exception as exception:
-            raise UpdateFailed() from exception
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

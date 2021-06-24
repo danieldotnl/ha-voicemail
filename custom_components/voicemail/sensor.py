@@ -1,15 +1,19 @@
 """Sensor platform for HA Voicemail."""
+from custom_components.voicemail.const import MACHINE_INSTANCE
+
 from .const import DEFAULT_NAME
 from .const import DOMAIN
 from .const import ICON
 from .const import SENSOR
 from .entity import VoicemailEntity
+from .machine import Machine
 
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Setup sensor platform."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_devices([VoicemailSensor(coordinator, entry)])
+    machine: Machine = hass.data[DOMAIN][entry.entry_id][MACHINE_INSTANCE]
+    # coordinator = hass.data[DOMAIN][entry.entry_id]
+    async_add_devices([VoicemailSensor(machine, entry)])
 
 
 class VoicemailSensor(VoicemailEntity):
@@ -23,7 +27,7 @@ class VoicemailSensor(VoicemailEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self.coordinator.data.get("body")
+        return self._machine.nofMessages()
 
     @property
     def icon(self):
