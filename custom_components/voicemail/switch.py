@@ -6,6 +6,7 @@ from .const import INTEGRATION_NAME
 from .const import MACHINE_INSTANCE
 from .const import SWITCH
 from .const import SWITCH_ICON
+from .entity import VoicemailEntity
 from .machine import Machine
 
 
@@ -15,10 +16,11 @@ async def async_setup_entry(hass, entry, async_add_devices):
     async_add_devices([VoicemailSwitch(machine, entry)])
 
 
-class VoicemailSwitch(SwitchEntity):
+class VoicemailSwitch(VoicemailEntity, SwitchEntity):
     """Voicemail switch class."""
 
     def __init__(self, machine, entry):
+        super().__init__(machine._name)
         self._machine = machine
         self._entry = entry
         self._state = False

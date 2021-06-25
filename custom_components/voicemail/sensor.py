@@ -7,6 +7,7 @@ from .const import INTEGRATION_NAME
 from .const import MESSAGE_COUNT
 from .const import SENSOR
 from .const import SENSOR_ICON
+from .entity import VoicemailEntity
 from .machine import Machine
 
 
@@ -16,10 +17,11 @@ async def async_setup_entry(hass, entry, async_add_devices):
     async_add_devices([VoicemailSensor(machine, entry)])
 
 
-class VoicemailSensor(SensorEntity):
+class VoicemailSensor(VoicemailEntity, SensorEntity):
     """voicemail Sensor class."""
 
     def __init__(self, machine, entry):
+        super().__init__(machine._name)
         self._machine = machine
         self._entry = entry
 
