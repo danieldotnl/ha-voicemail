@@ -1,8 +1,11 @@
+from homeassistant.helpers.entity import Entity
+
 from .const import DOMAIN
 
 
-class VoicemailEntity:
+class VoicemailEntity(Entity):
     def __init__(self, name):
+        super().__init__()
         self._name = name
 
     @property

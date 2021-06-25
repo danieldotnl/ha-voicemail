@@ -1,5 +1,6 @@
 """Switch platform for {{cookiecutter.friendly_name}}."""
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN
 from .const import INTEGRATION_NAME
@@ -16,7 +17,7 @@ async def async_setup_entry(hass, entry, async_add_devices):
     async_add_devices([VoicemailSwitch(machine, entry)])
 
 
-class VoicemailSwitch(VoicemailEntity, SwitchEntity):
+class VoicemailSwitch(VoicemailEntity, RestoreEntity, SwitchEntity):
     """Voicemail switch class."""
 
     def __init__(self, machine, entry):
@@ -28,10 +29,20 @@ class VoicemailSwitch(VoicemailEntity, SwitchEntity):
     def turn_on(self, **kwargs):  # pylint: disable=unused-argument
         """Turn on the switch."""
         self._state = True
+        self.async_write_ha_state()
 
     def turn_off(self, **kwargs):  # pylint: disable=unused-argument
         """Turn off the switch."""
         self._state = False
+        self.async_write_ha_state()
+
+    async def async_added_to_hass(self) -> None:
+        """Handle entity which will be added."""
+        await super().async_added_to_hass()
+        state = await self.async_get_last_state()
+        if not state:
+            return
+        self._state = state.state == "on"
 
     @property
     def name(self):
