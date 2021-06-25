@@ -1,10 +1,12 @@
 """Sensor platform for HA Voicemail."""
 from custom_components.voicemail.const import MACHINE_INSTANCE
+from homeassistant.components.sensor import SensorEntity
 
 from .const import DOMAIN
-from .const import ICON
 from .const import MESSAGE_COUNT
-from .entity import VoicemailEntity
+from .const import NAME
+from .const import SENSOR
+from .const import SENSOR_ICON
 from .machine import Machine
 
 
@@ -14,13 +16,17 @@ async def async_setup_entry(hass, entry, async_add_devices):
     async_add_devices([VoicemailSensor(machine, entry)])
 
 
-class VoicemailSensor(VoicemailEntity):
+class VoicemailSensor(SensorEntity):
     """voicemail Sensor class."""
+
+    def __init__(self, machine, entry):
+        self._machine = machine
+        self._entry = entry
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{self._machine._name} {MESSAGE_COUNT}"
+        return f"{NAME} {self._machine._name} {MESSAGE_COUNT}"
 
     @property
     def state(self):
@@ -30,9 +36,14 @@ class VoicemailSensor(VoicemailEntity):
     @property
     def icon(self):
         """Return the icon of the sensor."""
-        return ICON
+        return SENSOR_ICON
 
     @property
     def device_class(self):
         """Return de device class of the sensor."""
         return "voicemail__custom_device_class"
+
+    @property
+    def unique_id(self):
+        """Return a unique ID to use for this entity."""
+        return f"{SENSOR}_{self._entry.entry_id}"

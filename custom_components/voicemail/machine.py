@@ -36,7 +36,7 @@ class Machine:
         if condition == "True":
             await self.async_record(messages)
         else:
-            await self.async_play(messages)
+            await self._async_play_messages(messages)
 
     async def async_record(self, messages):
         for message in messages:
@@ -50,9 +50,13 @@ class Machine:
 
         _LOGGER.info("Call service %s with: %s", message["service"], message)
 
-        await self._hass.services.async_call(domain, name, message["data"])
+        await self._hass.services.async_call(domain, name, message.get("data"))
 
     async def async_play(self):
         while self.nofMessages() > 0:
             message = self._messages.pop(0)
+            await self._async_play_message(message)
+
+    async def _async_play_messages(self, messages):
+        for message in messages:
             await self._async_play_message(message)

@@ -1,6 +1,6 @@
 {
   "domain": "voicemail",
-  "name": "HA Voicemail",
+  "name": "Voicemail",
   "documentation": "https://github.com/danieldotnl/ha-voicemail",
   "issue_tracker": "https://github.com/danieldotnl/ha-voicemail/issues",
   "dependencies": [],

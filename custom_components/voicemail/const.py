@@ -1,6 +1,6 @@
 """Constants for HA Voicemail."""
 # Base component constants
-NAME = "HA Voicemail"
+NAME = "Voicemail"
 DOMAIN = "voicemail"
 DOMAIN_DATA = f"{DOMAIN}_data"
 VERSION = "0.0.1"
@@ -11,7 +11,8 @@ ISSUE_URL = "https://github.com/danieldotnl/ha-voicemail/issues"
 MACHINE_INSTANCE = "machine"
 
 # Icons
-ICON = "mdi:format-list-numbered"
+SENSOR_ICON = "mdi:format-list-numbered"
+SWITCH_ICON = "mdi:voicemail"
 
 # Device classes
 BINARY_SENSOR_DEVICE_CLASS = "connectivity"
@@ -21,14 +22,14 @@ BINARY_SENSOR = "binary_sensor"
 SENSOR = "sensor"
 SWITCH = "switch"
 # PLATFORMS = [BINARY_SENSOR, SENSOR, SWITCH]
-PLATFORMS = [SENSOR]
+PLATFORMS = [SENSOR, SWITCH]
 
 # Configuration and options
 CONF_ENABLED = "enabled"
 CONF_NAME = "name"
 
 # Defaults
-MESSAGE_COUNT = "messages count"
+MESSAGE_COUNT = "message count"
 
 
 # Services
