@@ -3,8 +3,8 @@ from custom_components.voicemail.const import MACHINE_INSTANCE
 from homeassistant.components.sensor import SensorEntity
 
 from .const import DOMAIN
+from .const import INTEGRATION_NAME
 from .const import MESSAGE_COUNT
-from .const import NAME
 from .const import SENSOR
 from .const import SENSOR_ICON
 from .machine import Machine
@@ -26,7 +26,7 @@ class VoicemailSensor(SensorEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{NAME} {self._machine._name} {MESSAGE_COUNT}"
+        return f"{INTEGRATION_NAME} {self._machine._name} {MESSAGE_COUNT}"
 
     @property
     def state(self):

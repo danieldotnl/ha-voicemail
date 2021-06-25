@@ -3,7 +3,10 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
+from .const import ATTR_CONDITION
 from .const import CONF_NAME
+from .const import INTEGRATION_NAME
+from .const import SWITCH
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,18 +25,25 @@ class Machine:
     async def async_record_when(self, service_call):
         _LOGGER.debug("%s was called with: %s", self._name, service_call)
 
-        condition_template = service_call["condition"]
+        condition_template = service_call.get(ATTR_CONDITION)
         if condition_template:
             condition_template.hass = self._hass
+            condition: bool = condition_template.async_render(parse_result=False)
+            _LOGGER.debug(
+                "Condition template %s rendered: %s", condition_template, condition
+            )
 
-        condition: bool = condition_template.async_render(parse_result=False)
-        _LOGGER.debug(
-            "Condition template %s rendered: %s", condition_template, condition
-        )
+        else:
+            # record when switch.voicemail is switched on
+            condition: bool = (
+                self._hass.states.get(f"{SWITCH}.{INTEGRATION_NAME}_{self._name}").state
+                == "on"
+            )
+            _LOGGER.debug("Condition based on switch: %s", condition)
 
         messages = service_call["messages"]
 
-        if condition == "True":
+        if condition == "True" or condition is True:
             await self.async_record(messages)
         else:
             await self._async_play_messages(messages)

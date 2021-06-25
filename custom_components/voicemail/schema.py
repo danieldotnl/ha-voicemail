@@ -18,7 +18,7 @@ SERVICE_RECORD_SCHEMA = {
 
 SERVICE_RECORD_WHEN_SCHEMA = vol.Schema(
     {
-        vol.Required(ATTR_CONDITION): cv.template,
+        vol.Optional(ATTR_CONDITION): cv.template,
         **SERVICE_RECORD_SCHEMA,
     }
 )

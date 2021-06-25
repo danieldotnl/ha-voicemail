@@ -1,6 +1,6 @@
 """Constants for HA Voicemail."""
 # Base component constants
-NAME = "Voicemail"
+INTEGRATION_NAME = "Voicemail"
 DOMAIN = "voicemail"
 DOMAIN_DATA = f"{DOMAIN}_data"
 VERSION = "0.0.1"

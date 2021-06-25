@@ -2,8 +2,8 @@
 from homeassistant.components.switch import SwitchEntity
 
 from .const import DOMAIN
+from .const import INTEGRATION_NAME
 from .const import MACHINE_INSTANCE
-from .const import NAME
 from .const import SWITCH
 from .const import SWITCH_ICON
 from .machine import Machine
@@ -34,7 +34,7 @@ class VoicemailSwitch(SwitchEntity):
     @property
     def name(self):
         """Return the name of the switch."""
-        return f"{NAME} {self._machine._name}"
+        return f"{INTEGRATION_NAME} {self._machine._name}"
 
     @property
     def is_on(self):
