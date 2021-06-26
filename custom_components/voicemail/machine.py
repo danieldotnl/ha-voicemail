@@ -9,6 +9,7 @@ from .const import INTEGRATION_NAME
 from .const import SWITCH
 
 _LOGGER = logging.getLogger(__name__)
+STORAGE_VERSION = 1
 
 
 class Machine:
@@ -19,8 +20,19 @@ class Machine:
         self._name = config.data.get(CONF_NAME)
         _LOGGER.debug("Entry %s has data: %s", config.entry_id, config.data)
 
+        key = f"{INTEGRATION_NAME}_{config.entry_id}"
+        self._store = hass.helpers.storage.Store(STORAGE_VERSION, key)
+
     def nofMessages(self):
         return len(self._messages)
+
+    async def async_save_messages(self):
+        await self._store.async_save(self._messages)
+
+    async def async_load_messages(self):
+        messages = await self._store.async_load()
+        if messages:
+            self._messages = messages
 
     async def async_record_when(self, service_call):
         _LOGGER.debug("%s was called with: %s", self._name, service_call)
@@ -52,6 +64,7 @@ class Machine:
         for message in messages:
             _LOGGER.info("Message will be recorded: %s", message)
             self._messages.append(message)
+        await self.async_save_messages()
 
     async def _async_play_message(self, message):
         service_id = message["service"].split(".")
@@ -66,6 +79,7 @@ class Machine:
         while self.nofMessages() > 0:
             message = self._messages.pop(0)
             await self._async_play_message(message)
+        await self.async_save_messages()
 
     async def _async_play_messages(self, messages):
         for message in messages:
