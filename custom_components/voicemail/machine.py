@@ -7,20 +7,21 @@ from .const import ATTR_CONDITION
 from .const import CONF_NAME
 from .const import INTEGRATION_NAME
 from .const import SWITCH
+from .helpers import message_update_signal
 
 _LOGGER = logging.getLogger(__name__)
 STORAGE_VERSION = 1
 
 
 class Machine:
-    def __init__(self, hass: HomeAssistant, config: ConfigEntry):
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry):
         self._hass = hass
-        self._config = config
+        self._entry = entry
         self._messages = []
-        self._name = config.data.get(CONF_NAME)
-        _LOGGER.debug("Entry %s has data: %s", config.entry_id, config.data)
+        self._name = entry.data.get(CONF_NAME)
+        _LOGGER.debug("Entry %s has data: %s", entry.entry_id, entry.data)
 
-        key = f"{INTEGRATION_NAME}_{config.entry_id}"
+        key = f"{INTEGRATION_NAME}_{entry.entry_id}"
         self._store = hass.helpers.storage.Store(STORAGE_VERSION, key)
 
     def nofMessages(self):
@@ -33,6 +34,9 @@ class Machine:
         messages = await self._store.async_load()
         if messages:
             self._messages = messages
+        self._hass.helpers.dispatcher.dispatcher_send(
+            message_update_signal(self._entry.entry_id)
+        )
 
     async def async_record_when(self, service_call):
         _LOGGER.debug("%s was called with: %s", self._name, service_call)
@@ -65,6 +69,9 @@ class Machine:
             _LOGGER.info("Message will be recorded: %s", message)
             self._messages.append(message)
         await self.async_save_messages()
+        self._hass.helpers.dispatcher.dispatcher_send(
+            message_update_signal(self._entry.entry_id)
+        )
 
     async def _async_play_message(self, message):
         service_id = message["service"].split(".")
@@ -80,6 +87,9 @@ class Machine:
             message = self._messages.pop(0)
             await self._async_play_message(message)
         await self.async_save_messages()
+        self._hass.helpers.dispatcher.dispatcher_send(
+            message_update_signal(self._entry.entry_id)
+        )
 
     async def _async_play_messages(self, messages):
         for message in messages:

@@ -14,14 +14,14 @@ from .machine import Machine
 async def async_setup_entry(hass, entry, async_add_devices):
     """Setup sensor platform."""
     machine: Machine = hass.data[DOMAIN][entry.entry_id][MACHINE_INSTANCE]
-    async_add_devices([VoicemailSwitch(machine, entry)])
+    async_add_devices([VoicemailSwitch(hass, machine, entry)])
 
 
 class VoicemailSwitch(VoicemailEntity, RestoreEntity, SwitchEntity):
     """Voicemail switch class."""
 
-    def __init__(self, machine, entry):
-        super().__init__(machine._name)
+    def __init__(self, hass, machine, entry):
+        super().__init__(hass, machine._name)
         self._machine = machine
         self._entry = entry
         self._state = False

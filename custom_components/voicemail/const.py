@@ -9,6 +9,7 @@ ATTRIBUTION = "Data provided by http://jsonplaceholder.typicode.com/"
 ISSUE_URL = "https://github.com/danieldotnl/ha-voicemail/issues"
 
 MACHINE_INSTANCE = "machine"
+MESSAGE_UPDATE_SIGNAL = "voicemail_update"
 
 # Icons
 SENSOR_ICON = "mdi:format-list-numbered"

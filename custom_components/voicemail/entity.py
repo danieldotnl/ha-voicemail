@@ -4,9 +4,10 @@ from .const import DOMAIN
 
 
 class VoicemailEntity(Entity):
-    def __init__(self, name):
+    def __init__(self, hass, name):
         super().__init__()
         self._name = name
+        self._hass = hass
 
     @property
     def device_info(self):
