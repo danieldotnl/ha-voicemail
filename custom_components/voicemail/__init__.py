@@ -16,6 +16,7 @@ from .const import DOMAIN
 from .const import MACHINE_INSTANCE
 from .const import PLATFORMS
 from .machine import Machine
+from .schema import SERVICE_RECORD_SCHEMA
 from .schema import SERVICE_RECORD_WHEN_SCHEMA
 
 SCAN_INTERVAL = timedelta(seconds=30)
@@ -39,12 +40,23 @@ async def _async_setup_services(hass: HomeAssistant, entry):
         await machine.async_record_when(service_call.data)
 
     async def async_play(service_call):
+        _LOGGER.debug("Service call: %s", service_call)
         machine: Machine = hass.data[DOMAIN][entry_id][MACHINE_INSTANCE]
         await machine.async_play()
+
+    async def async_record(service_call):
+        _LOGGER.debug("Service call: %s", service_call)
+        machine: Machine = hass.data[DOMAIN][entry_id][MACHINE_INSTANCE]
+        await machine.async_record(service_call.data)
+
+    hass.services.async_register(
+        DOMAIN, f"{name}_record", async_record, SERVICE_RECORD_SCHEMA
+    )
 
     hass.services.async_register(
         DOMAIN, f"{name}_record_when", async_record_when, SERVICE_RECORD_WHEN_SCHEMA
     )
+
     hass.services.async_register(DOMAIN, f"{name}_play_all", async_play)
 
 

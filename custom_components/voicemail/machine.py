@@ -38,6 +38,11 @@ class Machine:
             message_update_signal(self._entry.entry_id)
         )
 
+    async def async_record(self, service_call):
+        _LOGGER.debug("%s was called with: %s", self._name, service_call)
+        messages = service_call["messages"]
+        await self._async_record(messages)
+
     async def async_record_when(self, service_call):
         _LOGGER.debug("%s was called with: %s", self._name, service_call)
 
@@ -60,11 +65,11 @@ class Machine:
         messages = service_call["messages"]
 
         if condition == "True" or condition is True:
-            await self.async_record(messages)
+            await self._async_record(messages)
         else:
             await self._async_play_messages(messages)
 
-    async def async_record(self, messages):
+    async def _async_record(self, messages):
         for message in messages:
             _LOGGER.info("Message will be recorded: %s", message)
             self._messages.append(message)
