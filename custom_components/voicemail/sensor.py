@@ -5,7 +5,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import DOMAIN
 from .const import INTEGRATION_NAME
-from .const import MESSAGE_COUNT
+from .const import MESSAGES
 from .const import SENSOR
 from .const import SENSOR_ICON
 from .entity import VoicemailEntity
@@ -23,8 +23,7 @@ class VoicemailSensor(VoicemailEntity, SensorEntity):
     """voicemail Sensor class."""
 
     def __init__(self, hass, machine, entry):
-        super().__init__(hass, machine._name)
-        self._machine = machine
+        super().__init__(hass, machine)
         self._entry = entry
 
     async def async_on_demand_update(self):
@@ -45,7 +44,7 @@ class VoicemailSensor(VoicemailEntity, SensorEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{INTEGRATION_NAME} {self._machine._name} {MESSAGE_COUNT}"
+        return f"{INTEGRATION_NAME} {self._machine.name} {MESSAGES}"
 
     @property
     def should_poll(self):

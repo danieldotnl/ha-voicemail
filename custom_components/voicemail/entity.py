@@ -1,12 +1,13 @@
 from homeassistant.helpers.entity import Entity
 
 from .const import DOMAIN
+from .machine import Machine
 
 
 class VoicemailEntity(Entity):
-    def __init__(self, hass, name):
+    def __init__(self, hass, machine: Machine):
         super().__init__()
-        self._name = name
+        self._machine = machine
         self._hass = hass
 
     @property
@@ -14,8 +15,8 @@ class VoicemailEntity(Entity):
         return {
             "identifiers": {
                 # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self._name)
+                (DOMAIN, self._machine.name)
             },
-            "name": self.name,
+            "name": self._machine.name,
             "manufacturer": "HA Voicemail",
         }

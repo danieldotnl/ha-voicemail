@@ -18,7 +18,7 @@ class Machine:
         self._hass = hass
         self._entry = entry
         self._messages = []
-        self._name = entry.data.get(CONF_NAME)
+        self.name = entry.data.get(CONF_NAME)
         _LOGGER.debug("Entry %s has data: %s", entry.entry_id, entry.data)
 
         key = f"{INTEGRATION_NAME}_{entry.entry_id}"
@@ -39,12 +39,12 @@ class Machine:
         )
 
     async def async_record(self, service_call):
-        _LOGGER.debug("%s was called with: %s", self._name, service_call)
+        _LOGGER.debug("%s was called with: %s", self.name, service_call)
         messages = service_call["messages"]
         await self._async_record(messages)
 
     async def async_record_when(self, service_call):
-        _LOGGER.debug("%s was called with: %s", self._name, service_call)
+        _LOGGER.debug("%s was called with: %s", self.name, service_call)
 
         condition_template = service_call.get(ATTR_CONDITION)
         if condition_template:
@@ -57,7 +57,7 @@ class Machine:
         else:
             # record when switch.voicemail is switched on
             condition: bool = (
-                self._hass.states.get(f"{SWITCH}.{INTEGRATION_NAME}_{self._name}").state
+                self._hass.states.get(f"{SWITCH}.{INTEGRATION_NAME}_{self.name}").state
                 == "on"
             )
             _LOGGER.debug("Condition based on switch: %s", condition)

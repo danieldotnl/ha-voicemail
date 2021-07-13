@@ -21,8 +21,7 @@ class VoicemailSwitch(VoicemailEntity, RestoreEntity, SwitchEntity):
     """Voicemail switch class."""
 
     def __init__(self, hass, machine, entry):
-        super().__init__(hass, machine._name)
-        self._machine = machine
+        super().__init__(hass, machine)
         self._entry = entry
         self._state = False
 

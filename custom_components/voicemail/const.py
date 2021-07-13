@@ -30,7 +30,7 @@ CONF_ENABLED = "enabled"
 CONF_NAME = "name"
 
 # Defaults
-MESSAGE_COUNT = "message count"
+MESSAGES = "messages"
 
 
 # Services
