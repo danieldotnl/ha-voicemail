@@ -27,10 +27,10 @@ class Machine:
     def nofMessages(self):
         return len(self._messages)
 
-    async def async_save_messages(self):
+    async def _async_save_messages(self):
         await self._store.async_save(self._messages)
 
-    async def async_load_messages(self):
+    async def async_setup(self):
         messages = await self._store.async_load()
         if messages:
             self._messages = messages
@@ -73,7 +73,7 @@ class Machine:
         for message in messages:
             _LOGGER.info("Message will be recorded: %s", message)
             self._messages.append(message)
-        await self.async_save_messages()
+        await self._async_save_messages()
         self._hass.helpers.dispatcher.dispatcher_send(
             message_update_signal(self._entry.entry_id)
         )
@@ -91,7 +91,7 @@ class Machine:
         while self.nofMessages() > 0:
             message = self._messages.pop(0)
             await self._async_play_message(message)
-        await self.async_save_messages()
+        await self._async_save_messages()
         self._hass.helpers.dispatcher.dispatcher_send(
             message_update_signal(self._entry.entry_id)
         )

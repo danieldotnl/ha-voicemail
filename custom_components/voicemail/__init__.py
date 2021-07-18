@@ -67,7 +67,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {}
 
     machine = Machine(hass, entry)
-    await machine.async_load_messages()
+    await machine.async_setup()
 
     data = {
         MACHINE_INSTANCE: machine,
