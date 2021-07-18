@@ -46,7 +46,7 @@ class VoicemailSwitch(VoicemailEntity, RestoreEntity, SwitchEntity):
     @property
     def name(self):
         """Return the name of the switch."""
-        return f"{INTEGRATION_NAME} {self._machine._name}"
+        return f"{INTEGRATION_NAME} {self._machine.name}"
 
     @property
     def is_on(self):
