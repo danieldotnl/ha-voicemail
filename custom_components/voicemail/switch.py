@@ -4,24 +4,24 @@ from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN
 from .const import INTEGRATION_NAME
-from .const import MACHINE_INSTANCE
 from .const import SWITCH
 from .const import SWITCH_ICON
+from .const import VOICEMAIL_INSTANCE
 from .entity import VoicemailEntity
-from .machine import Machine
+from .voicemail import Voicemail
 
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Setup sensor platform."""
-    machine: Machine = hass.data[DOMAIN][entry.entry_id][MACHINE_INSTANCE]
-    async_add_devices([VoicemailSwitch(hass, machine, entry)])
+    voicemail: Voicemail = hass.data[DOMAIN][entry.entry_id][VOICEMAIL_INSTANCE]
+    async_add_devices([VoicemailSwitch(hass, voicemail, entry)])
 
 
 class VoicemailSwitch(VoicemailEntity, RestoreEntity, SwitchEntity):
     """Voicemail switch class."""
 
-    def __init__(self, hass, machine, entry):
-        super().__init__(hass, machine)
+    def __init__(self, hass, voicemail, entry):
+        super().__init__(hass, voicemail)
         self._entry = entry
         self._state = False
 
@@ -46,7 +46,7 @@ class VoicemailSwitch(VoicemailEntity, RestoreEntity, SwitchEntity):
     @property
     def name(self):
         """Return the name of the switch."""
-        return f"{INTEGRATION_NAME} {self._machine.name}"
+        return f"{INTEGRATION_NAME} {self._voicemail.name}"
 
     @property
     def is_on(self):

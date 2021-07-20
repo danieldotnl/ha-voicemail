@@ -8,7 +8,7 @@ VERSION = "0.0.1"
 ATTRIBUTION = "Data provided by http://jsonplaceholder.typicode.com/"
 ISSUE_URL = "https://github.com/danieldotnl/ha-voicemail/issues"
 
-MACHINE_INSTANCE = "machine"
+VOICEMAIL_INSTANCE = "voicemail"
 MESSAGE_UPDATE_SIGNAL = "voicemail_update"
 
 # Icons
@@ -22,8 +22,9 @@ BINARY_SENSOR_DEVICE_CLASS = "connectivity"
 BINARY_SENSOR = "binary_sensor"
 SENSOR = "sensor"
 SWITCH = "switch"
+SELECT = "select"
 # PLATFORMS = [BINARY_SENSOR, SENSOR, SWITCH]
-PLATFORMS = [SENSOR, SWITCH]
+PLATFORMS = [SENSOR, SWITCH, SELECT]
 
 # Configuration and options
 CONF_ENABLED = "enabled"

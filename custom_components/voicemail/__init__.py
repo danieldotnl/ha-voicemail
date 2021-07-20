@@ -11,13 +11,15 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Config
 from homeassistant.core import HomeAssistant
 
+from .const import ATTR_CONDITION
 from .const import CONF_NAME
 from .const import DOMAIN
-from .const import MACHINE_INSTANCE
 from .const import PLATFORMS
-from .machine import Machine
+from .const import VOICEMAIL_INSTANCE
+from .helpers import convert_raw_messages
 from .schema import SERVICE_RECORD_SCHEMA
 from .schema import SERVICE_RECORD_WHEN_SCHEMA
+from .voicemail import Voicemail
 
 SCAN_INTERVAL = timedelta(seconds=30)
 
@@ -34,30 +36,40 @@ async def _async_setup_services(hass: HomeAssistant, entry):
     entry_id = entry.entry_id
     name = entry.data[CONF_NAME]
 
-    async def async_record_when(service_call):
-        _LOGGER.debug("Service call: %s", service_call)
-        machine: Machine = hass.data[DOMAIN][entry_id][MACHINE_INSTANCE]
-        await machine.async_record_when(service_call.data)
-
-    async def async_play(service_call):
-        _LOGGER.debug("Service call: %s", service_call)
-        machine: Machine = hass.data[DOMAIN][entry_id][MACHINE_INSTANCE]
-        await machine.async_play()
-
     async def async_record(service_call):
         _LOGGER.debug("Service call: %s", service_call)
-        machine: Machine = hass.data[DOMAIN][entry_id][MACHINE_INSTANCE]
-        await machine.async_record(service_call.data)
+        raw_messages = service_call.data["messages"]
+        messages = convert_raw_messages(raw_messages)
 
-    hass.services.async_register(
-        DOMAIN, f"{name}_record", async_record, SERVICE_RECORD_SCHEMA
-    )
+        voicemail: Voicemail = hass.data[DOMAIN][entry_id][VOICEMAIL_INSTANCE]
+        await voicemail.async_record(messages)
+
+    async def async_record_when(service_call):
+        _LOGGER.debug("Service call: %s", service_call)
+
+        condition = service_call.data.get(ATTR_CONDITION)
+        raw_messages = service_call.data["messages"]
+        messages = convert_raw_messages(raw_messages)
+
+        _LOGGER.debug("%s was called with: %s", name, raw_messages)
+
+        voicemail: Voicemail = hass.data[DOMAIN][entry_id][VOICEMAIL_INSTANCE]
+        await voicemail.async_record_when(condition, messages)
+
+    async def async_play_all(service_call):
+        _LOGGER.debug("Service call: %s", service_call)
+        voicemail: Voicemail = hass.data[DOMAIN][entry_id][VOICEMAIL_INSTANCE]
+        await voicemail.async_play_all()
+
+    hass.services.async_register(DOMAIN, f"{name}_record", async_record)
 
     hass.services.async_register(
         DOMAIN, f"{name}_record_when", async_record_when, SERVICE_RECORD_WHEN_SCHEMA
     )
 
-    hass.services.async_register(DOMAIN, f"{name}_play_all", async_play)
+    hass.services.async_register(
+        DOMAIN, f"{name}_play_all", async_play_all, SERVICE_RECORD_SCHEMA
+    )
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -66,11 +78,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {}
 
-    machine = Machine(hass, entry)
-    await machine.async_setup()
+    voicemail = Voicemail(hass, entry)
+    await voicemail.async_setup()
 
     data = {
-        MACHINE_INSTANCE: machine,
+        VOICEMAIL_INSTANCE: voicemail,
     }
     hass.data[DOMAIN][entry.entry_id] = data
     await _async_setup_services(hass, entry)
