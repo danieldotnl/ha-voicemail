@@ -22,6 +22,7 @@ async def async_setup_entry(hass, entry, async_add_devices):
 
 class VoicemailSelect(VoicemailEntity, SelectEntity):
     def __init__(self, hass, voicemail, entry):
+        SelectEntity.__init__(self)
         super().__init__(hass, voicemail)
         self._entry = entry
         self._attr_options = []
@@ -32,11 +33,8 @@ class VoicemailSelect(VoicemailEntity, SelectEntity):
         self._attr_current_option = option
 
     async def _async_refresh(self):
-        self._options = []
-        for message in self._voicemail.peek_all():
-            _LOGGER.debug("Looping through messages with name: %s", message.name)
-            self._options.append(message.name)
-        self._attr_options = self._options
+        self._attr_options = [message.name for message in self._voicemail.peek_all()]
+
         if not self._attr_current_option and len(self._attr_options) > 0:
             self._attr_current_option = self._attr_options[0]
         elif self._attr_current_option not in self._attr_options:
