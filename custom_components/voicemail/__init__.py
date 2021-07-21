@@ -61,15 +61,15 @@ async def _async_setup_services(hass: HomeAssistant, entry):
         voicemail: Voicemail = hass.data[DOMAIN][entry_id][VOICEMAIL_INSTANCE]
         await voicemail.async_play_all()
 
-    hass.services.async_register(DOMAIN, f"{name}_record", async_record)
+    hass.services.async_register(
+        DOMAIN, f"{name}_record", async_record, SERVICE_RECORD_SCHEMA
+    )
 
     hass.services.async_register(
         DOMAIN, f"{name}_record_when", async_record_when, SERVICE_RECORD_WHEN_SCHEMA
     )
 
-    hass.services.async_register(
-        DOMAIN, f"{name}_play_all", async_play_all, SERVICE_RECORD_SCHEMA
-    )
+    hass.services.async_register(DOMAIN, f"{name}_play_all", async_play_all)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):

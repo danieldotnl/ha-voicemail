@@ -22,16 +22,25 @@ class VoicemailSelect(VoicemailEntity, SelectEntity):
     def __init__(self, hass, voicemail, entry):
         super().__init__(hass, voicemail)
         self._entry = entry
-        self._attr_options = self._refresh()
+        self._attr_options = []
         self._attr_current_option = None
 
     async def async_select_option(self, option: str) -> None:
         _LOGGER.debug("Option chosen from select: %s", option)
         self._attr_current_option = option
 
-    def _refresh(self):
-        self._options = ["a", "b", "c", "d"]  # self._voicemail.peek()
+    async def _async_refresh(self):
+        self._options = []
+        for message in self._voicemail.peek_all():
+            _LOGGER.debug("Looping through messages with name: %s", message.name)
+            self._options.append(message.name)
         self._attr_options = self._options
+        if not self._attr_current_option and len(self._attr_options) > 0:
+            self._attr_current_option = self._attr_options[0]
+        elif self._attr_current_option not in self._attr_options:
+            self._attr_current_option = None
+
+        self.async_schedule_update_ha_state(True)
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -40,6 +49,12 @@ class VoicemailSelect(VoicemailEntity, SelectEntity):
             async_dispatcher_connect(
                 self._hass,
                 message_update_signal(self._entry.entry_id),
-                self._refresh,
+                self._async_refresh,
             )
         )
+        await self._async_refresh()
+
+    @property
+    def should_poll(self):
+        """Return the polling state."""
+        return False

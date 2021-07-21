@@ -19,6 +19,9 @@ class Voicemail:
     def message_count(self):
         return len(self._store)
 
+    def peek_all(self):
+        return self._store.peek_all()
+
     async def async_setup(self):
         await self._store.async_load_messages()
 

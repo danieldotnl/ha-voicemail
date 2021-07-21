@@ -4,6 +4,7 @@ from datetime import datetime
 from json.encoder import JSONEncoder
 
 from .const import INTEGRATION_NAME
+from .helpers import convert_raw_messages
 from .helpers import message_update_signal
 
 STORAGE_VERSION = 1
@@ -24,16 +25,18 @@ class MessageStore:
     def __len__(self):
         return len(self._messages)
 
+    def peek_all(self):
+        return self._messages.copy()
+
     async def async_load_messages(self):
-        messages = await self._store.async_load()
-        if messages:
-            self._messages = messages
+        json_messages = await self._store.async_load()
+        if json_messages:
+            self._messages = convert_raw_messages(json_messages)
         self._hass.helpers.dispatcher.dispatcher_send(
             message_update_signal(self._entry_id)
         )
 
     async def _async_save_messages(self):
-        # _LOGGER.debug("SDFS: %s", vars(self._messages[0]))json.dumps(employee, indent=4, cls=EmployeeEncoder)
         _LOGGER.debug(
             "LOGGING data is: %s", json.dumps(self._messages, cls=MessageEncoder)
         )
