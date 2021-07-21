@@ -11,7 +11,12 @@ def convert_raw_messages(raw_messages):
     for raw_message in raw_messages:
         messages.append(
             Message(
-                raw_message.get("name"), raw_message["service"], raw_message["data"]
+                name=raw_message.get("name"),
+                service=raw_message["service"],
+                data=raw_message["data"],
+                created=raw_message.get("created"),
+                uid=raw_message.get("uid"),
+                expires=raw_message.get("expires"),
             )
         )
 

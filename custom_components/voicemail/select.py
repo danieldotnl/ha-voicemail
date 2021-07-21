@@ -4,6 +4,8 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import DOMAIN
+from .const import INTEGRATION_NAME
+from .const import MESSAGES
 from .const import VOICEMAIL_INSTANCE
 from .entity import VoicemailEntity
 from .helpers import message_update_signal
@@ -53,6 +55,11 @@ class VoicemailSelect(VoicemailEntity, SelectEntity):
             )
         )
         await self._async_refresh()
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{INTEGRATION_NAME} {self._voicemail.name} {MESSAGES}"
 
     @property
     def should_poll(self):

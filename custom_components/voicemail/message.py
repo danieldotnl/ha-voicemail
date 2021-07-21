@@ -2,8 +2,10 @@ from datetime import datetime
 
 
 class Message:
-    def __init__(self, name, service, data):
-        self.name = name
-        self.service = service
-        self.data = data
-        self.created = datetime.now()
+    def __init__(self, **kwargs):
+        self.name = kwargs["name"]
+        self.service = kwargs["service"]
+        self.data = kwargs["data"]
+        self.uid = kwargs["uid"]
+        self.expires = kwargs["expires"]
+        self.created = kwargs["created"] if kwargs["created"] else datetime.now()
