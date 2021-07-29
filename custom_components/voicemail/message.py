@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 
@@ -6,6 +7,9 @@ class Message:
         self.name = kwargs["name"]
         self.service = kwargs["service"]
         self.data = kwargs["data"]
-        self.uid = kwargs["uid"]
+        if kwargs["code"]:
+            self.code = kwargs["code"]
+        else:
+            self.code = uuid.uuid4().hex
         self.expires = kwargs["expires"]
         self.created = kwargs["created"] if kwargs["created"] else datetime.now()

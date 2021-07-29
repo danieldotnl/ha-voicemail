@@ -15,7 +15,7 @@ class MessageStore:
     def __init__(self, hass, entry_id):
         self._hass = hass
         self._entry_id = entry_id
-        self._messages = []
+        self._messages = {}
 
         key = f"{INTEGRATION_NAME}_{self._entry_id}"
         self._store = hass.helpers.storage.Store(
@@ -26,7 +26,7 @@ class MessageStore:
         return len(self._messages)
 
     def peek_all(self):
-        return self._messages.copy()
+        return list(self._messages.values())
 
     async def async_load_messages(self):
         json_messages = await self._store.async_load()
@@ -50,11 +50,16 @@ class MessageStore:
     #     )
 
     async def append_list(self, messages):
-        self._messages.extend(messages)
+        for message in messages:
+            self._append(message)
+
         await self._async_save_messages()
         self._hass.helpers.dispatcher.dispatcher_send(
             message_update_signal(self._entry_id)
         )
+
+    def _append(self, message):
+        self._messages[message.code] = message
 
     async def pop(self, index: int = 0):
         message = self._messages.pop(index)
@@ -65,12 +70,12 @@ class MessageStore:
         return message
 
     async def pop_all(self):
-        result, self._messages = self._messages, []
+        result, self._messages = self._messages, {}
         await self._async_save_messages()
         self._hass.helpers.dispatcher.dispatcher_send(
             message_update_signal(self._entry_id)
         )
-        return result
+        return list(result.values())
 
 
 class MessageEncoder(JSONEncoder):

@@ -15,7 +15,7 @@ def convert_raw_messages(raw_messages):
                 service=raw_message["service"],
                 data=raw_message["data"],
                 created=raw_message.get("created"),
-                uid=raw_message.get("uid"),
+                code=raw_message.get("code"),
                 expires=raw_message.get("expires"),
             )
         )
