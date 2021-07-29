@@ -1,8 +1,11 @@
 import logging
 
 from homeassistant.const import CONF_NAME
+from homeassistant.helpers import template
 
+from .const import FINISH_TEMPLATE
 from .const import INTEGRATION_NAME
+from .const import START_TEMPLATE
 from .const import SWITCH
 from .store import MessageStore
 
@@ -52,11 +55,31 @@ class Voicemail:
 
     async def async_play(self, messages):
         for message in messages:
-            _LOGGER.debug("Call service %s with: %s", message.service, message.data)
+            data = _create_template(message.data)
+
+            print("Data %s", data)
+            template.attach(self._hass, data)
+            result = template.render_complex(data)
+            print("Parsed data: %s", result)
+
             domain, service = message.service.split(".", 1)
-            await self._hass.services.async_call(domain, service, message.data)
+            _LOGGER.debug("Call service %s with: %s", message.service, result)
+            await self._hass.services.async_call(domain, service, result)
 
     async def async_play_all(self):
         messages = await self._store.pop_all()
         _LOGGER.debug("Playing all %s messages", len(messages))
         await self.async_play(messages)
+
+
+def _create_template(data):
+    if isinstance(data, dict):
+        return {k: _create_template(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [_create_template(i) for i in data]
+    else:
+        data = data.replace(START_TEMPLATE, "{{")
+        data = data.replace(FINISH_TEMPLATE, "}}")
+        if template.is_template_string(data):
+            return template.Template(data)
+        return data

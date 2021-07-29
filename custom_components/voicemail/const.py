@@ -38,3 +38,6 @@ MESSAGES = "messages"
 ATTR_CONDITION = "condition"
 ATTR_MESSAGES = "messages"
 ATTR_SERVICE = "service"
+
+START_TEMPLATE = "{!{"
+FINISH_TEMPLATE = "}!}"
