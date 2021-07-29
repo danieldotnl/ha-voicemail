@@ -6,18 +6,29 @@ def message_update_signal(entry_id):
     return f"{MESSAGE_UPDATE_SIGNAL}_{entry_id}"
 
 
-def convert_raw_messages(raw_messages):
+def json2message(json_message):
+    return Message(
+        name=json_message.get("name"),
+        service=json_message["service"],
+        data=json_message["data"],
+        created=json_message.get("created"),
+        code=json_message.get("code"),
+        expires=json_message.get("expires"),
+    )
+
+
+def json_messages_to_list(json_messages):
     messages = []
-    for raw_message in raw_messages:
-        messages.append(
-            Message(
-                name=raw_message.get("name"),
-                service=raw_message["service"],
-                data=raw_message["data"],
-                created=raw_message.get("created"),
-                code=raw_message.get("code"),
-                expires=raw_message.get("expires"),
-            )
-        )
+    for json_message in json_messages:
+        messages.append(json2message(json_message))
+
+    return messages
+
+
+def json_messages_to_dict(json_messages):
+    messages = {}
+    for json_message in json_messages:
+        message = json2message(json_message)
+        messages[message.code] = message
 
     return messages

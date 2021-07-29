@@ -16,7 +16,7 @@ from .const import CONF_NAME
 from .const import DOMAIN
 from .const import PLATFORMS
 from .const import VOICEMAIL_INSTANCE
-from .helpers import convert_raw_messages
+from .helpers import json_messages_to_list
 from .schema import SERVICE_RECORD_SCHEMA
 from .schema import SERVICE_RECORD_WHEN_SCHEMA
 from .voicemail import Voicemail
@@ -39,7 +39,7 @@ async def _async_setup_services(hass: HomeAssistant, entry):
     async def async_record(service_call):
         _LOGGER.debug("Service call: %s", service_call)
         raw_messages = service_call.data["messages"]
-        messages = convert_raw_messages(raw_messages)
+        messages = json_messages_to_list(raw_messages)
 
         voicemail: Voicemail = hass.data[DOMAIN][entry_id][VOICEMAIL_INSTANCE]
         await voicemail.async_record(messages)
@@ -49,7 +49,7 @@ async def _async_setup_services(hass: HomeAssistant, entry):
 
         condition = service_call.data.get(ATTR_CONDITION)
         raw_messages = service_call.data["messages"]
-        messages = convert_raw_messages(raw_messages)
+        messages = json_messages_to_list(raw_messages)
 
         _LOGGER.debug("%s was called with: %s", name, raw_messages)
 

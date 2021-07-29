@@ -9,6 +9,7 @@ MESSAGE_SCHEMA = vol.Schema(
     {
         vol.Required("name"): cv.string,
         vol.Required(ATTR_SERVICE): cv.service,
+        vol.Optional("code"): cv.string,
         vol.Optional("data"): vol.All(dict, cv.template_complex),
     }
 )

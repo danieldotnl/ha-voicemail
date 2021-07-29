@@ -4,7 +4,7 @@ from datetime import datetime
 from json.encoder import JSONEncoder
 
 from .const import INTEGRATION_NAME
-from .helpers import convert_raw_messages
+from .helpers import json_messages_to_dict
 from .helpers import message_update_signal
 
 STORAGE_VERSION = 1
@@ -31,7 +31,7 @@ class MessageStore:
     async def async_load_messages(self):
         json_messages = await self._store.async_load()
         if json_messages:
-            self._messages = convert_raw_messages(json_messages)
+            self._messages = json_messages_to_dict(json_messages.values())
         self._hass.helpers.dispatcher.dispatcher_send(
             message_update_signal(self._entry_id)
         )
