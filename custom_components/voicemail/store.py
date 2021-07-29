@@ -26,7 +26,9 @@ class MessageStore:
         return len(self._messages)
 
     def peek_all(self):
-        return list(self._messages.values().sort(key=lambda m: m.created))
+        peeked = list(self._messages.values())
+        peeked.sort(key=lambda m: m.created)
+        return peeked
 
     async def async_load_messages(self):
         json_messages = await self._store.async_load()
@@ -75,7 +77,9 @@ class MessageStore:
         self._hass.helpers.dispatcher.dispatcher_send(
             message_update_signal(self._entry_id)
         )
-        return list(result.values().sort(key=lambda m: m.created))
+        popped = list(result.values())
+        popped.sort(key=lambda m: m.created)
+        return popped
 
 
 class MessageEncoder(JSONEncoder):
